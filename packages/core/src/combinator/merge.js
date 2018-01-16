@@ -53,7 +53,7 @@ class Merge {
     this.sources = sources
   }
 
-  run (sink, scheduler) {
+  run (runStream, sink, scheduler) {
     const l = this.sources.length
     const disposables = new Array(l)
     const sinks = new Array(l)
@@ -62,7 +62,7 @@ class Merge {
 
     for (let indexSink, i = 0; i < l; ++i) {
       indexSink = sinks[i] = new IndexSink(i, mergeSink)
-      disposables[i] = this.sources[i].run(indexSink, scheduler)
+      disposables[i] = runStream(this.sources[i], indexSink, scheduler)
     }
 
     return disposeAll(disposables)

@@ -3,7 +3,6 @@
 /** @author John Hann */
 
 import Pipe from '../sink/Pipe'
-import { run } from '../run'
 import { withLocalTime } from '../combinator/withLocalTime'
 import { disposeOnce, tryDispose } from '@most/disposable'
 
@@ -16,18 +15,19 @@ class ContinueWith {
     this.source = source
   }
 
-  run (sink, scheduler) {
-    return new ContinueWithSink(this.f, this.source, sink, scheduler)
+  run (runStream, sink, scheduler) {
+    return new ContinueWithSink(this.f, runStream, this.source, sink, scheduler)
   }
 }
 
 class ContinueWithSink extends Pipe {
-  constructor (f, source, sink, scheduler) {
+  constructor (f, runStream, source, sink, scheduler) {
     super(sink)
     this.f = f
+    this.runStream = runStream
     this.scheduler = scheduler
     this.active = true
-    this.disposable = disposeOnce(source.run(this, scheduler))
+    this.disposable = disposeOnce(runStream(source, this, scheduler))
   }
 
   event (t, x) {
@@ -56,7 +56,7 @@ class ContinueWithSink extends Pipe {
   }
 
   _continue (f, t, sink) {
-    return run(sink, this.scheduler, withLocalTime(t, f()))
+    return this.runStream(sink, this.scheduler, withLocalTime(t, f()))
   }
 
   dispose () {

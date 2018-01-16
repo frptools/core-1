@@ -11,7 +11,7 @@ class At {
     this.value = x
   }
 
-  run (sink, scheduler) {
+  run (runStream, sink, scheduler) {
     return delay(this.time, propagateTask(runAt, this.value, sink), scheduler)
   }
 }

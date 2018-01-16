@@ -8,8 +8,12 @@ export type Clock = {
   now (): Time;
 }
 
+export interface RunStream<A> {
+  (stream: Stream<A>, sink: Sink<A>, scheduler: Scheduler): Disposable;
+}
+
 export interface Stream<A> {
-  run (sink: Sink<A>, scheduler: Scheduler): Disposable;
+  run (runStream: RunStream<A>, sink: Sink<A>, scheduler: Scheduler): Disposable;
 }
 
 export interface Sink<A> {

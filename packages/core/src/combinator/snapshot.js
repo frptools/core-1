@@ -19,10 +19,10 @@ export class Snapshot {
     this.sampler = sampler
   }
 
-  run (sink, scheduler) {
+  run (runStream, sink, scheduler) {
     const sampleSink = new SnapshotSink(this.f, sink)
-    const valuesDisposable = this.values.run(sampleSink.latest, scheduler)
-    const samplerDisposable = this.sampler.run(sampleSink, scheduler)
+    const valuesDisposable = runStream(this.values, sampleSink.latest, scheduler)
+    const samplerDisposable = runStream(this.sampler, sampleSink, scheduler)
 
     return disposeBoth(samplerDisposable, valuesDisposable)
   }

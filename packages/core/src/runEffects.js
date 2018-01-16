@@ -1,17 +1,25 @@
 /** @license MIT License (c) copyright 2010-2017 original author or authors */
 
-import { curry2 } from '@most/prelude'
+import { curry2, curry3 } from '@most/prelude'
 import SettableDisposable from './disposable/SettableDisposable'
 
 export const runEffects = curry2((stream, scheduler) =>
   new Promise((resolve, reject) =>
-    runStream(stream, scheduler, resolve, reject)))
+    run(defaultRun, stream, scheduler, resolve, reject)))
 
-function runStream (stream, scheduler, resolve, reject) {
+function defaultRun (stream, sink, scheduler) {
+  return stream.run(defaultRun, sink, scheduler)
+}
+
+export const runEffectsWith = curry3((runStream, stream, scheduler) =>
+  new Promise((resolve, reject) =>
+    run(runStream, stream, scheduler, resolve, reject)))
+
+function run (runStream, stream, scheduler, resolve, reject) {
   const disposable = new SettableDisposable()
   const observer = new RunEffectsSink(resolve, reject, disposable)
 
-  disposable.setDisposable(stream.run(observer, scheduler))
+  disposable.setDisposable(runStream(stream, observer, scheduler))
 }
 
 class RunEffectsSink {

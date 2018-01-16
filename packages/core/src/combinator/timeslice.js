@@ -21,10 +21,10 @@ class Until {
     this.source = source
   }
 
-  run (sink, scheduler) {
+  run (runStream, sink, scheduler) {
     const min = new Bound(-Infinity, sink)
-    const max = new UpperBound(this.maxSignal, sink, scheduler)
-    const disposable = this.source.run(new TimeWindowSink(min, max, sink), scheduler)
+    const max = new UpperBound(runStream, this.maxSignal, sink, scheduler)
+    const disposable = runStream(this.source, new TimeWindowSink(min, max, sink), scheduler)
 
     return disposeAll([min, max, disposable])
   }
@@ -36,10 +36,10 @@ class Since {
     this.source = source
   }
 
-  run (sink, scheduler) {
-    const min = new LowerBound(this.minSignal, sink, scheduler)
+  run (runStream, sink, scheduler) {
+    const min = new LowerBound(runStream, this.minSignal, sink, scheduler)
     const max = new Bound(Infinity, sink)
-    const disposable = this.source.run(new TimeWindowSink(min, max, sink), scheduler)
+    const disposable = runStream(this.source, new TimeWindowSink(min, max, sink), scheduler)
 
     return disposeAll([min, max, disposable])
   }
@@ -72,10 +72,10 @@ class TimeWindowSink extends Pipe {
 }
 
 class LowerBound extends Pipe {
-  constructor (signal, sink, scheduler) {
+  constructor (runStream, signal, sink, scheduler) {
     super(sink)
     this.value = Infinity
-    this.disposable = signal.run(this, scheduler)
+    this.disposable = runStream(signal, this, scheduler)
   }
 
   event (t /*, x */) {
@@ -92,10 +92,10 @@ class LowerBound extends Pipe {
 }
 
 class UpperBound extends Pipe {
-  constructor (signal, sink, scheduler) {
+  constructor (runStream, signal, sink, scheduler) {
     super(sink)
     this.value = Infinity
-    this.disposable = signal.run(this, scheduler)
+    this.disposable = runStream(signal, this, scheduler)
   }
 
   event (t, x) {

@@ -10,8 +10,9 @@ export type Clock = {
   now (): Time
 }
 
+export type RunStream<A> = (Stream<A>, Sink<A>, Scheduler) => Disposable;
 export type Stream<A> = {
-  run (Sink<A>, Scheduler): Disposable
+  run (RunStream<A>, Sink<A>, Scheduler): Disposable
 }
 
 export type Sink<A> = {

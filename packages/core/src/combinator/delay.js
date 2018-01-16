@@ -21,9 +21,9 @@ class Delay {
     this.source = source
   }
 
-  run (sink, scheduler) {
+  run (runStream, sink, scheduler) {
     const delaySink = new DelaySink(this.dt, sink, scheduler)
-    return disposeBoth(delaySink, this.source.run(delaySink, scheduler))
+    return disposeBoth(delaySink, runStream(this.source, delaySink, scheduler))
   }
 }
 

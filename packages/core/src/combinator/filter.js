@@ -39,8 +39,8 @@ class SkipRepeats {
     this.source = source
   }
 
-  run (sink, scheduler) {
-    return this.source.run(new SkipRepeatsSink(this.equals, sink), scheduler)
+  run (runStream, sink, scheduler) {
+    return runStream(this.source, new SkipRepeatsSink(this.equals, sink), scheduler)
   }
 }
 

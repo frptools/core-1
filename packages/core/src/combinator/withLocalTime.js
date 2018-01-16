@@ -15,8 +15,8 @@ class WithLocalTime {
     this.source = source
   }
 
-  run (sink, scheduler) {
-    return this.source.run(relativeSink(this.origin, sink), schedulerRelativeTo(this.origin, scheduler))
+  run (runStream, sink, scheduler) {
+    return runStream(this.source, relativeSink(this.origin, sink), schedulerRelativeTo(this.origin, scheduler))
   }
 }
 

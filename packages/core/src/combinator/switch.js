@@ -22,14 +22,15 @@ class Switch {
     this.source = source
   }
 
-  run (sink, scheduler) {
-    const switchSink = new SwitchSink(sink, scheduler)
-    return disposeBoth(switchSink, this.source.run(switchSink, scheduler))
+  run (runStream, sink, scheduler) {
+    const switchSink = new SwitchSink(runStream, sink, scheduler)
+    return disposeBoth(switchSink, runStream(this.source, switchSink, scheduler))
   }
 }
 
 class SwitchSink {
-  constructor (sink, scheduler) {
+  constructor (runStream, sink, scheduler) {
+    this.runStream = runStream;
     this.sink = sink
     this.scheduler = scheduler
     this.current = null
@@ -38,7 +39,7 @@ class SwitchSink {
 
   event (t, stream) {
     this._disposeCurrent(t)
-    this.current = new Segment(stream, t, Infinity, this, this.sink, this.scheduler)
+    this.current = new Segment(this.runStream, stream, t, Infinity, this, this.sink, this.scheduler)
   }
 
   end (t) {
@@ -86,12 +87,12 @@ class SwitchSink {
 }
 
 class Segment {
-  constructor (source, min, max, outer, sink, scheduler) {
+  constructor (runStream, source, min, max, outer, sink, scheduler) {
     this.min = min
     this.max = max
     this.outer = outer
     this.sink = sink
-    this.disposable = source.run(this, schedulerRelativeTo(min, scheduler))
+    this.disposable = runStream(source, this, schedulerRelativeTo(min, scheduler))
   }
 
   event (t, x) {

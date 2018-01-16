@@ -11,8 +11,8 @@ export default class FilterMap {
     this.source = source
   }
 
-  run (sink, scheduler) {
-    return this.source.run(new FilterMapSink(this.p, this.f, sink), scheduler)
+  run (runStream, sink, scheduler) {
+    return runStream(this.source, new FilterMapSink(this.p, this.f, sink), scheduler)
   }
 }
 

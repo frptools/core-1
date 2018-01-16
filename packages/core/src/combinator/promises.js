@@ -29,8 +29,8 @@ class Await {
     this.source = source
   }
 
-  run (sink, scheduler) {
-    return this.source.run(new AwaitSink(sink, scheduler), scheduler)
+  run (runStream, sink, scheduler) {
+    return runStream(this.source, new AwaitSink(sink, scheduler), scheduler)
   }
 }
 

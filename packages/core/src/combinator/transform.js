@@ -39,8 +39,8 @@ class Tap {
     this.f = f
   }
 
-  run (sink, scheduler) {
-    return this.source.run(new TapSink(this.f, sink), scheduler)
+  run (runStream, sink, scheduler) {
+    return runStream(this.source, new TapSink(this.f, sink), scheduler)
   }
 }
 

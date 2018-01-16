@@ -12,7 +12,7 @@ export const containsCanonicalEmpty = streams =>
   streams.some(isCanonicalEmpty)
 
 class Empty {
-  run (sink, scheduler) {
+  run (runStream, sink, scheduler) {
     return asap(propagateEndTask(sink), scheduler)
   }
 }

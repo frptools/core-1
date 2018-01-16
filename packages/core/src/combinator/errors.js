@@ -8,7 +8,6 @@ import { asap } from '@most/scheduler'
 import { tryEvent, tryEnd } from '../source/tryEvent'
 import { empty, isCanonicalEmpty } from '../source/empty'
 import { propagateErrorTask } from '../scheduler/PropagateTask'
-import { run } from '../run'
 import { withLocalTime } from './withLocalTime'
 
 /**
@@ -20,7 +19,7 @@ import { withLocalTime } from './withLocalTime'
  */
 export const recoverWith = (f, stream) =>
   isCanonicalEmpty(stream) ? empty()
-    : new RecoverWith(f, stream)
+    : new RecoverWith(f, runStream, stream)
 
 /**
  * Create a stream containing only an error
@@ -35,7 +34,7 @@ class ErrorStream {
     this.value = e
   }
 
-  run (sink, scheduler) {
+  run (runStream, sink, scheduler) {
     return asap(propagateErrorTask(this.value, sink), scheduler)
   }
 }
@@ -46,17 +45,18 @@ class RecoverWith {
     this.source = source
   }
 
-  run (sink, scheduler) {
-    return new RecoverWithSink(this.f, this.source, sink, scheduler)
+  run (runStream, sink, scheduler) {
+    return new RecoverWithSink(this.f, runStream, this.source, sink, scheduler)
   }
 }
 
 class RecoverWithSink {
-  constructor (f, source, sink, scheduler) {
+  constructor (f, runStream, source, sink, scheduler) {
     this.f = f
+    this.runStream = runStream;
     this.sink = new SafeSink(sink)
     this.scheduler = scheduler
-    this.disposable = source.run(this, scheduler)
+    this.disposable = runStream(source, this, scheduler)
   }
 
   event (t, x) {
@@ -84,7 +84,7 @@ class RecoverWithSink {
   }
 
   _continue (f, t, x, sink) {
-    return run(sink, this.scheduler, withLocalTime(t, f(x)))
+    return this.runStream(sink, this.scheduler, withLocalTime(t, f(x)))
   }
 
   dispose () {

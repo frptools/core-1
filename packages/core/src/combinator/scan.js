@@ -25,9 +25,9 @@ class Scan {
     this.value = z
   }
 
-  run (sink, scheduler) {
+  run (runStream, sink, scheduler) {
     const d1 = asap(propagateEventTask(this.value, sink), scheduler)
-    const d2 = this.source.run(new ScanSink(this.f, this.value, sink), scheduler)
+    const d2 = runStream(this.source, new ScanSink(this.f, this.value, sink), scheduler)
     return disposeBoth(d1, d2)
   }
 }

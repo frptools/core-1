@@ -40,7 +40,7 @@ class Zip {
     this.sources = sources
   }
 
-  run (sink, scheduler) {
+  run (runStream, sink, scheduler) {
     const l = this.sources.length
     const disposables = new Array(l)
     const sinks = new Array(l)
@@ -51,7 +51,7 @@ class Zip {
     for (let indexSink, i = 0; i < l; ++i) {
       buffers[i] = new Queue()
       indexSink = sinks[i] = new IndexSink(i, zipSink)
-      disposables[i] = this.sources[i].run(indexSink, scheduler)
+      disposables[i] = runStream(this.sources[i], indexSink, scheduler)
     }
 
     return disposeAll(disposables)

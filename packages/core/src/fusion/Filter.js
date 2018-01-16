@@ -11,8 +11,8 @@ export default class Filter {
     this.source = source
   }
 
-  run (sink, scheduler) {
-    return this.source.run(new FilterSink(this.p, sink), scheduler)
+  run (runStream, sink, scheduler) {
+    return runStream(this.source, new FilterSink(this.p, sink), scheduler)
   }
 
   /**

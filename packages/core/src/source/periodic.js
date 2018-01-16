@@ -18,7 +18,7 @@ class Periodic {
     this.period = period
   }
 
-  run (sink, scheduler) {
+  run (runStream, sink, scheduler) {
     return schedulePeriodic(this.period, propagateEventTask(undefined, sink), scheduler)
   }
 }

@@ -30,8 +30,8 @@ class Throttle {
     this.source = source
   }
 
-  run (sink, scheduler) {
-    return this.source.run(new ThrottleSink(this.period, sink), scheduler)
+  run (runStream, sink, scheduler) {
+    return runStream(this.source, new ThrottleSink(this.period, sink), scheduler)
   }
 }
 
@@ -66,20 +66,20 @@ class Debounce {
     this.source = source
   }
 
-  run (sink, scheduler) {
-    return new DebounceSink(this.dt, this.source, sink, scheduler)
+  run (runStream, sink, scheduler) {
+    return new DebounceSink(this.dt, runStream, this.source, sink, scheduler)
   }
 }
 
 class DebounceSink {
-  constructor (dt, source, sink, scheduler) {
+  constructor (dt, runStream, source, sink, scheduler) {
     this.dt = dt
     this.sink = sink
     this.scheduler = scheduler
     this.value = void 0
     this.timer = null
 
-    this.disposable = source.run(this, scheduler)
+    this.disposable = runStream(source, this, scheduler)
   }
 
   event (t, x) {

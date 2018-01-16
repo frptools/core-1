@@ -54,11 +54,11 @@ class Slice {
     this.max = max
   }
 
-  run (sink, scheduler) {
+  run (runStream, sink, scheduler) {
     const disposable = new SettableDisposable()
     const sliceSink = new SliceSink(this.min, this.max - this.min, sink, disposable)
 
-    disposable.setDisposable(this.source.run(sliceSink, scheduler))
+    disposable.setDisposable(runStream(this.source, sliceSink, scheduler))
 
     return disposable
   }
@@ -102,11 +102,11 @@ class TakeWhile {
     this.source = source
   }
 
-  run (sink, scheduler) {
+  run (runStream, sink, scheduler) {
     const disposable = new SettableDisposable()
     const takeWhileSink = new TakeWhileSink(this.p, sink, disposable)
 
-    disposable.setDisposable(this.source.run(takeWhileSink, scheduler))
+    disposable.setDisposable(runStream(this.source, takeWhileSink, scheduler))
 
     return disposable
   }
@@ -147,8 +147,8 @@ class SkipWhile {
     this.source = source
   }
 
-  run (sink, scheduler) {
-    return this.source.run(new SkipWhileSink(this.p, sink), scheduler)
+  run (runStream, sink, scheduler) {
+    return runStream(this.source, new SkipWhileSink(this.p, sink), scheduler)
   }
 }
 
@@ -182,8 +182,8 @@ class SkipAfter {
     this.source = source
   }
 
-  run (sink, scheduler) {
-    return this.source.run(new SkipAfterSink(this.p, sink), scheduler)
+  run (runStream, sink, scheduler) {
+    return runStream(this.source, new SkipAfterSink(this.p, sink), scheduler)
   }
 }
 

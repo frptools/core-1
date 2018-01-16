@@ -12,8 +12,8 @@ class Multicast {
   constructor (source) {
     this.source = new MulticastSource(source)
   }
-  run (sink, scheduler) {
-    return this.source.run(sink, scheduler)
+  run (runStream, sink, scheduler) {
+    return runStream(this.source, sink, scheduler)
   }
 }
 
@@ -24,10 +24,10 @@ export class MulticastSource {
     this.disposable = disposeNone()
   }
 
-  run (sink, scheduler) {
+  run (runStream, sink, scheduler) {
     const n = this.add(sink)
     if (n === 1) {
-      this.disposable = this.source.run(this, scheduler)
+      this.disposable = runStream(this.source, this, scheduler)
     }
     return disposeOnce(new MulticastDisposable(this, sink))
   }

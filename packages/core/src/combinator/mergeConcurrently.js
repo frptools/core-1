@@ -20,20 +20,21 @@ class MergeConcurrently {
     this.source = source
   }
 
-  run (sink, scheduler) {
-    return new Outer(this.f, this.concurrency, this.source, sink, scheduler)
+  run (runStream, sink, scheduler) {
+    return new Outer(this.f, runStream, this.concurrency, this.source, sink, scheduler)
   }
 }
 
 class Outer {
-  constructor (f, concurrency, source, sink, scheduler) {
+  constructor (f, runStream, concurrency, source, sink, scheduler) {
     this.f = f
+    this.runStream = runStream;
     this.concurrency = concurrency
     this.sink = sink
     this.scheduler = scheduler
     this.pending = []
     this.current = new LinkedList()
-    this.disposable = disposeOnce(source.run(this, scheduler))
+    this.disposable = disposeOnce(runStream(source, this, scheduler))
     this.active = true
   }
 
@@ -59,7 +60,7 @@ class Outer {
 
   _initInner (t, x) {
     const innerSink = new Inner(t, this, this.sink)
-    innerSink.disposable = mapAndRun(this.f, t, x, innerSink, this.scheduler)
+    innerSink.disposable = mapAndRun(this.f, this.runStream, t, x, innerSink, this.scheduler)
     this.current.add(innerSink)
   }
 
@@ -99,8 +100,8 @@ class Outer {
   }
 }
 
-const mapAndRun = (f, t, x, sink, scheduler) =>
-  f(x).run(sink, schedulerRelativeTo(t, scheduler))
+const mapAndRun = (f, t, x, runStream, sink, scheduler) =>
+  runStream(f(x), sink, schedulerRelativeTo(t, scheduler))
 
 class Inner {
   constructor (time, outer, sink) {
