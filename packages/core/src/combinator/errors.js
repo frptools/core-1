@@ -84,7 +84,7 @@ class RecoverWithSink {
   }
 
   _continue (f, t, x, sink) {
-    return this.runStream(sink, this.scheduler, withLocalTime(t, f(x)))
+    return this.runStream(withLocalTime(t, f(x)), sink, this.scheduler)
   }
 
   dispose () {

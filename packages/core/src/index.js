@@ -18,10 +18,14 @@ export const withItems = curry2(_withItems)
 // -----------------------------------------------------------------------
 // Observing
 
-import { runEffects as _runEffects } from './runEffects'
+import {
+  runEffects as _runEffects,
+  runEffectsWith as _runEffectsWith
+} from './runEffects'
 import { run as _run } from './run'
 
 export const runEffects = curry2(_runEffects)
+export const runEffectsWith = curry3(_runEffectsWith)
 export const run = curry3(_run)
 
 // -------------------------------------------------------

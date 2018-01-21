@@ -56,7 +56,7 @@ class ContinueWithSink extends Pipe {
   }
 
   _continue (f, t, sink) {
-    return this.runStream(sink, this.scheduler, withLocalTime(t, f()))
+    return this.runStream(withLocalTime(t, f()), sink, this.scheduler)
   }
 
   dispose () {

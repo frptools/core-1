@@ -60,7 +60,7 @@ class Outer {
 
   _initInner (t, x) {
     const innerSink = new Inner(t, this, this.sink)
-    innerSink.disposable = mapAndRun(this.f, this.runStream, t, x, innerSink, this.scheduler)
+    innerSink.disposable = mapAndRun(this.f, t, x, this.runStream, innerSink, this.scheduler)
     this.current.add(innerSink)
   }
 
